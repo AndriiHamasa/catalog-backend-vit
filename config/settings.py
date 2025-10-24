@@ -210,36 +210,65 @@ REST_FRAMEWORK = {
 # ==============================================
 # PRODUCTION SETTINGS (Railway)
 # ==============================================
-import os
-import sys
+# import os
+# import sys
 
-# Определяем запущено ли на Railway
+# # Определяем запущено ли на Railway
+# RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
+
+# if RAILWAY_ENVIRONMENT:
+#     # Продакшен настройки
+#     DEBUG = False
+    
+#     # Railway автоматически предоставляет RAILWAY_PUBLIC_DOMAIN
+#     RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
+#     if RAILWAY_PUBLIC_DOMAIN:
+#         ALLOWED_HOSTS = [RAILWAY_PUBLIC_DOMAIN, '.railway.app']
+#     else:
+#         ALLOWED_HOSTS = ['*']
+    
+#     # Security settings для продакшена
+#     # SECURE_SSL_REDIRECT = True
+#     # SESSION_COOKIE_SECURE = True
+#     # CSRF_COOKIE_SECURE = True
+#     # SECURE_BROWSER_XSS_FILTER = True
+#     # SECURE_CONTENT_TYPE_NOSNIFF = True
+#     # SECURE_HSTS_SECONDS = 31536000
+#     # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#     # SECURE_HSTS_PRELOAD = True
+    
+#     # CORS для продакшена
+#     CORS_ALLOW_ALL_ORIGINS = False
+#     # Добавь сюда свой фронтенд домен после деплоя
+#     CORS_ALLOWED_ORIGINS = [
+#         # "https://your-frontend.vercel.app",
+#     ]
+
+# ==============================================
+# PRODUCTION SETTINGS (Railway)
+# ==============================================
+import os
+
 RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
 
 if RAILWAY_ENVIRONMENT:
-    # Продакшен настройки
     DEBUG = False
+    ALLOWED_HOSTS = ['*']
     
-    # Railway автоматически предоставляет RAILWAY_PUBLIC_DOMAIN
-    RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
-    if RAILWAY_PUBLIC_DOMAIN:
-        ALLOWED_HOSTS = [RAILWAY_PUBLIC_DOMAIN, '.railway.app']
-    else:
-        ALLOWED_HOSTS = ['*']
+    # Доверяем Railway прокси для HTTPS
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     
-    # Security settings для продакшена
-    # SECURE_SSL_REDIRECT = True
-    # SESSION_COOKIE_SECURE = True
-    # CSRF_COOKIE_SECURE = True
-    # SECURE_BROWSER_XSS_FILTER = True
-    # SECURE_CONTENT_TYPE_NOSNIFF = True
-    # SECURE_HSTS_SECONDS = 31536000
-    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    # SECURE_HSTS_PRELOAD = True
-    
-    # CORS для продакшена
-    CORS_ALLOW_ALL_ORIGINS = False
-    # Добавь сюда свой фронтенд домен после деплоя
-    CORS_ALLOWED_ORIGINS = [
-        # "https://your-frontend.vercel.app",
+    # CSRF настройки для Railway
+    CSRF_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = [
+        'https://*.railway.app',
+        'https://*.up.railway.app',
     ]
+    
+    # Session настройки
+    SESSION_COOKIE_SECURE = True
+    
+    # Остальные настройки безопасности
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    
