@@ -9,6 +9,7 @@ from .serializers import (
     ProductDetailSerializer
 )
 from .permissions import IsAdminOrReadOnly
+from .pagination import ProductPagination 
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]  # Защита!
+    pagination_class = None
     
     def destroy(self, request, *args, **kwargs):
         """Удаление категории"""
@@ -60,6 +62,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'title', 'price']
     ordering = ['-created_at']
     permission_classes = [IsAdminOrReadOnly]  # Защита!
+    pagination_class = ProductPagination 
     
     def get_queryset(self):
         """Для списка показываем только активные, для админки - все"""
@@ -84,9 +87,18 @@ class ProductViewSet(viewsets.ModelViewSet):
         if not category_id:
             return Response({'error': 'ID категории не указан'}, status=400)
         
-        products = self.get_queryset().filter(category_id=category_id)
-        serializer = self.get_serializer(products, many=True)
+        queryset = self.filter_queryset(self.get_queryset().filter(category_id=category_id))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+        # products = self.get_queryset().filter(category_id=category_id)
+        # serializer = self.get_serializer(products, many=True)
+        # return Response(serializer.data)
     
     @action(detail=False, methods=['get'])
     def new_arrivals(self, request):
@@ -94,8 +106,18 @@ class ProductViewSet(viewsets.ModelViewSet):
         Получить новые поставки
         GET /api/products/new_arrivals/
         """
-        products = self.get_queryset().filter(status='new', is_active=True)
-        serializer = self.get_serializer(products, many=True)
+        # products = self.get_queryset().filter(status='new', is_active=True)
+        # serializer = self.get_serializer(products, many=True)
+        # return Response(serializer.data)
+        queryset = self.filter_queryset(self.get_queryset().filter(status='new', is_active=True))
+        
+        # Применяем пагинацию
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
     @action(detail=True, methods=['post'])
