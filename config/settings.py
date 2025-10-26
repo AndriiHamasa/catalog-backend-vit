@@ -144,7 +144,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -194,58 +194,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
 }
-
-# REST Framework settings
-# REST_FRAMEWORK = {
-#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-#     'PAGE_SIZE': 100,
-    
-#     # Добавляем аутентификацию и права
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.SessionAuthentication',
-#         'rest_framework.authentication.BasicAuthentication',
-#     ],
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-#     ],
-# }
-
-# ==============================================
-# PRODUCTION SETTINGS (Railway)
-# ==============================================
-# import os
-# import sys
-
-# # Определяем запущено ли на Railway
-# RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
-
-# if RAILWAY_ENVIRONMENT:
-#     # Продакшен настройки
-#     DEBUG = False
-    
-#     # Railway автоматически предоставляет RAILWAY_PUBLIC_DOMAIN
-#     RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
-#     if RAILWAY_PUBLIC_DOMAIN:
-#         ALLOWED_HOSTS = [RAILWAY_PUBLIC_DOMAIN, '.railway.app']
-#     else:
-#         ALLOWED_HOSTS = ['*']
-    
-#     # Security settings для продакшена
-#     # SECURE_SSL_REDIRECT = True
-#     # SESSION_COOKIE_SECURE = True
-#     # CSRF_COOKIE_SECURE = True
-#     # SECURE_BROWSER_XSS_FILTER = True
-#     # SECURE_CONTENT_TYPE_NOSNIFF = True
-#     # SECURE_HSTS_SECONDS = 31536000
-#     # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-#     # SECURE_HSTS_PRELOAD = True
-    
-#     # CORS для продакшена
-#     CORS_ALLOW_ALL_ORIGINS = False
-#     # Добавь сюда свой фронтенд домен после деплоя
-#     CORS_ALLOWED_ORIGINS = [
-#         # "https://your-frontend.vercel.app",
-#     ]
 
 # ==============================================
 # PRODUCTION SETTINGS (Railway)
