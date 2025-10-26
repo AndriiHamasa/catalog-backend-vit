@@ -38,7 +38,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv(
 # Application definition
 
 INSTALLED_APPS = [
-    'cloudinary_storage',
+    # 'cloudinary_storage',
     'cloudinary',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -193,7 +193,33 @@ CORS_ALLOW_HEADERS = [
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
+    # JWT Authentication
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
 }
+
+# ==============================================
+# JWT SETTINGS
+# ==============================================
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
+
 
 # ==============================================
 # PRODUCTION SETTINGS (Railway)
@@ -227,26 +253,40 @@ if RAILWAY_ENVIRONMENT:
 # ==============================================
 # CLOUDINARY SETTINGS (для загрузки изображений)
 # ==============================================
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
+# import cloudinary
+# # import cloudinary.uploader
+# # import cloudinary.api
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+#     'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+#     'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+# }
+
+# # Используем Cloudinary для media файлов на продакшене
+# if RAILWAY_ENVIRONMENT or not DEBUG:
+#     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+#     cloudinary.config(
+#         cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+#         api_key=CLOUDINARY_STORAGE['API_KEY'],
+#         api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+#         secure=True
+#     )
+# else:
+#     # Локально используем обычное хранилище
+#     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# ==============================================
+# CLOUDINARY (только для загрузки изображений!)
+# ==============================================
+import cloudinary
+
+CLOUDINARY_CONFIG = {
+    'cloud_name': config('CLOUDINARY_CLOUD_NAME', default=''),
+    'api_key': config('CLOUDINARY_API_KEY', default=''),
+    'api_secret': config('CLOUDINARY_API_SECRET', default=''),
 }
 
-# Используем Cloudinary для media файлов на продакшене
-if RAILWAY_ENVIRONMENT or not DEBUG:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    cloudinary.config(
-        cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
-        api_key=CLOUDINARY_STORAGE['API_KEY'],
-        api_secret=CLOUDINARY_STORAGE['API_SECRET'],
-        secure=True
-    )
-else:
-    # Локально используем обычное хранилище
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+cloudinary.config(**CLOUDINARY_CONFIG)
+

@@ -1,4 +1,5 @@
 from django.db import models
+from .fields import CloudinaryImageField 
 
 
 class Category(models.Model):
@@ -66,7 +67,8 @@ class ProductImage(models.Model):
         related_name='images',
         verbose_name='Товар'
     )
-    image = models.ImageField('Изображение', upload_to='products/%Y/%m/%d/')
+    # image = models.ImageField('Изображение', upload_to='products/%Y/%m/%d/')
+    image = CloudinaryImageField('Изображение', upload_to='products/%Y/%m/%d/')
     order = models.PositiveIntegerField('Порядок', default=0)
     created_at = models.DateTimeField('Создано', auto_now_add=True)
     
