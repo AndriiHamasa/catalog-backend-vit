@@ -129,3 +129,26 @@ class ProductImage(models.Model):
         if not self.image and not self.image_url:
             raise ValidationError('Загрузите файл или укажите URL изображения')
         
+    def save(self, *args, **kwargs):
+        """Переопределяем сохранение для загрузки на Cloudinary"""
+        if self.image and not self.image_url:
+            # Если загружен файл - загружаем на Cloudinary
+            import cloudinary.uploader
+            from django.conf import settings
+            
+            if settings.RAILWAY_ENVIRONMENT:
+                try:
+                    # Загружаем на Cloudinary
+                    upload_result = cloudinary.uploader.upload(
+                        self.image,
+                        folder="products",
+                        resource_type="image"
+                    )
+                    # Сохраняем URL в image_url
+                    self.image_url = upload_result['secure_url']
+                    # Очищаем поле image
+                    self.image = None
+                except Exception as e:
+                    print(f"❌ Ошибка загрузки на Cloudinary: {e}")
+        
+        super().save(*args, **kwargs)
