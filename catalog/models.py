@@ -1,5 +1,4 @@
 from django.db import models
-from .fields import CloudinaryImageField 
 
 
 class Category(models.Model):
@@ -59,6 +58,27 @@ class Product(models.Model):
         return self.title
 
 
+# class ProductImage(models.Model):
+#     """Изображения товара"""
+#     product = models.ForeignKey(
+#         Product, 
+#         on_delete=models.CASCADE, 
+#         related_name='images',
+#         verbose_name='Товар'
+#     )
+#     # image = models.ImageField('Изображение', upload_to='products/%Y/%m/%d/')
+#     image = CloudinaryImageField('Изображение', upload_to='products/%Y/%m/%d/')
+#     order = models.PositiveIntegerField('Порядок', default=0)
+#     created_at = models.DateTimeField('Создано', auto_now_add=True)
+    
+#     class Meta:
+#         verbose_name = 'Изображение товара'
+#         verbose_name_plural = 'Изображения товаров'
+#         ordering = ['order', 'created_at']
+    
+#     def __str__(self):
+#         return f"Фото {self.product.title}"
+
 class ProductImage(models.Model):
     """Изображения товара"""
     product = models.ForeignKey(
@@ -67,8 +87,23 @@ class ProductImage(models.Model):
         related_name='images',
         verbose_name='Товар'
     )
-    # image = models.ImageField('Изображение', upload_to='products/%Y/%m/%d/')
-    image = CloudinaryImageField('Изображение', upload_to='products/%Y/%m/%d/')
+    
+    # Два способа загрузки: файл ИЛИ URL
+    image = models.ImageField(
+        'Загрузить файл', 
+        upload_to='products/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        help_text='Загрузите изображение с компьютера'
+    )
+    image_url = models.URLField(
+        'Или вставьте URL',
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text='Вставьте прямую ссылку на изображение (например, с Cloudinary)'
+    )
+    
     order = models.PositiveIntegerField('Порядок', default=0)
     created_at = models.DateTimeField('Создано', auto_now_add=True)
     
@@ -79,3 +114,18 @@ class ProductImage(models.Model):
     
     def __str__(self):
         return f"Фото {self.product.title}"
+    
+    def get_image_url(self):
+        """Возвращает URL изображения (из файла или из URL поля)"""
+        if self.image_url:
+            return self.image_url
+        elif self.image:
+            return self.image.url
+        return None
+    
+    def clean(self):
+        """Валидация: должно быть заполнено хотя бы одно поле"""
+        from django.core.exceptions import ValidationError
+        if not self.image and not self.image_url:
+            raise ValidationError('Загрузите файл или укажите URL изображения')
+        

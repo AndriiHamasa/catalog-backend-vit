@@ -14,11 +14,23 @@ class CategorySerializer(serializers.ModelSerializer):
         return obj.products.filter(is_active=True).count()
 
 
+# class ProductImageSerializer(serializers.ModelSerializer):
+#     """Сериализатор для изображений"""
+#     class Meta:
+#         model = ProductImage
+#         fields = ['id', 'image', 'order']
+
 class ProductImageSerializer(serializers.ModelSerializer):
     """Сериализатор для изображений"""
+    image = serializers.SerializerMethodField()
+    
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'order']
+    
+    def get_image(self, obj):
+        """Возвращает URL изображения (из файла или URL поля)"""
+        return obj.get_image_url()
 
 
 class ProductListSerializer(serializers.ModelSerializer):
