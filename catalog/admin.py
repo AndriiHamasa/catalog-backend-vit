@@ -29,19 +29,34 @@ class CategoryAdmin(admin.ModelAdmin):
 #             )
 #         return "Нет изображения"
 #     image_preview.short_description = 'Превью'
+# class ProductImageInline(admin.TabularInline):
+#     """Инлайн для изображений товара"""
+#     model = ProductImage
+#     extra = 1
+#     fields = ['image', 'image_url', 'order', 'image_preview']
+#     readonly_fields = ['image_preview']
+    
+#     def image_preview(self, obj):
+#         url = obj.get_image_url()
+#         if url:
+#             return format_html(
+#                 '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
+#                 url
+#             )
+#         return "Нет изображения"
+#     image_preview.short_description = 'Превью'
 class ProductImageInline(admin.TabularInline):
     """Инлайн для изображений товара"""
     model = ProductImage
     extra = 1
-    fields = ['image', 'image_url', 'order', 'image_preview']
+    fields = ['image_url', 'order', 'image_preview']
     readonly_fields = ['image_preview']
     
     def image_preview(self, obj):
-        url = obj.get_image_url()
-        if url:
+        if obj.image_url:
             return format_html(
                 '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
-                url
+                obj.image_url
             )
         return "Нет изображения"
     image_preview.short_description = 'Превью'
@@ -167,29 +182,48 @@ class ProductAdmin(admin.ModelAdmin):
 #         return "Нет изображения"
 #     image_preview.short_description = 'Превью'
 
+# @admin.register(ProductImage)
+# class ProductImageAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'product', 'image_preview', 'has_file', 'has_url', 'order', 'created_at']
+#     list_filter = ['created_at']
+#     search_fields = ['product__title']
+#     list_editable = ['order']
+#     fields = ['product', 'image', 'image_url', 'order', 'image_preview']
+#     readonly_fields = ['image_preview']
+    
+#     def image_preview(self, obj):
+#         url = obj.get_image_url()
+#         if url:
+#             return format_html(
+#                 '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
+#                 url
+#             )
+#         return "Нет изображения"
+#     image_preview.short_description = 'Превью'
+    
+#     def has_file(self, obj):
+#         return '✅' if obj.image else '❌'
+#     has_file.short_description = 'Файл'
+    
+#     def has_url(self, obj):
+#         return '✅' if obj.image_url else '❌'
+#     has_url.short_description = 'URL'
+
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'product', 'image_preview', 'has_file', 'has_url', 'order', 'created_at']
+    list_display = ['id', 'product', 'image_preview', 'order', 'created_at']
     list_filter = ['created_at']
     search_fields = ['product__title']
     list_editable = ['order']
-    fields = ['product', 'image', 'image_url', 'order', 'image_preview']
+    fields = ['product', 'image_url', 'order', 'image_preview']
     readonly_fields = ['image_preview']
     
     def image_preview(self, obj):
-        url = obj.get_image_url()
-        if url:
+        if obj.image_url:
             return format_html(
                 '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
-                url
+                obj.image_url
             )
         return "Нет изображения"
     image_preview.short_description = 'Превью'
     
-    def has_file(self, obj):
-        return '✅' if obj.image else '❌'
-    has_file.short_description = 'Файл'
-    
-    def has_url(self, obj):
-        return '✅' if obj.image_url else '❌'
-    has_url.short_description = 'URL'
