@@ -52,12 +52,24 @@ class ProductImageInline(admin.TabularInline):
     fields = ['image', 'image_url', 'order', 'image_preview']
     readonly_fields = ['image_preview']
     
+    # def image_preview(self, obj):
+    #     if obj.image_url:
+    #         return format_html(
+    #             '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
+    #             obj.image_url
+    #         )
+    #     return "Нет изображения"
     def image_preview(self, obj):
-        if obj.image_url:
-            return format_html(
-                '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
-                obj.image_url
-            )
+        try:
+            url = obj.get_image_url()
+            if url:
+                return format_html(
+                    '<img src="{}" style="max-height: 100px; max-width: 200px; border-radius: 5px;" />',
+                    url
+                )
+        except Exception as e:
+            return f"❌ Ошибка: {e}"
+        
         return "Нет изображения"
     image_preview.short_description = 'Превью'
 

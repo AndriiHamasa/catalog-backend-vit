@@ -232,13 +232,27 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"Фото {self.product.title}"
     
+    # def get_image_url(self):
+    #     """Возвращает URL изображения"""
+    #     if self.image_url:
+    #         return self.image_url
+    #     elif self.image:
+    #         return self.image.url
+    #     return None
     def get_image_url(self):
-        """Возвращает URL изображения"""
-        if self.image_url:
-            return self.image_url
-        elif self.image:
-            return self.image.url
-        return None
+        """Возвращает URL изображения с защитой от ошибок"""
+        try:
+            if self.image_url:
+                return self.image_url
+            elif self.image:
+                # Проверяем что файл существует
+                if hasattr(self.image, 'url'):
+                    return self.image.url
+        except Exception as e:
+            # Логируем ошибку но не ломаем приложение
+            print(f"⚠️ Error getting image URL: {e}")
+
+        return None  # Возвращаем None если ничего не получилось
     
     def clean(self):
         """Валидация"""
