@@ -246,43 +246,43 @@ class ProductImage(models.Model):
         if not self.image and not self.image_url:
             raise ValidationError('Загрузите файл или укажите URL изображения')
     
-    def save(self, *args, **kwargs):
-        """Обработка загрузки на Cloudinary"""
-        from django.conf import settings
+    # def save(self, *args, **kwargs):
+    #     """Обработка загрузки на Cloudinary"""
+    #     from django.conf import settings
         
-        # Только на Railway загружаем на Cloudinary
-        if self.image and not self.image_url and hasattr(settings, 'RAILWAY_ENVIRONMENT') and settings.RAILWAY_ENVIRONMENT:
-            try:
-                import cloudinary.uploader
+    #     # Только на Railway загружаем на Cloudinary
+    #     if self.image and not self.image_url and hasattr(settings, 'RAILWAY_ENVIRONMENT') and settings.RAILWAY_ENVIRONMENT:
+    #         try:
+    #             import cloudinary.uploader
                 
-                # Правильное чтение файла
-                if isinstance(self.image, (InMemoryUploadedFile, TemporaryUploadedFile)):
-                    # Файл загружен через форму
-                    self.image.seek(0)
-                    file_to_upload = self.image
-                else:
-                    # Файл уже на диске
-                    file_to_upload = self.image.path
+    #             # Правильное чтение файла
+    #             if isinstance(self.image, (InMemoryUploadedFile, TemporaryUploadedFile)):
+    #                 # Файл загружен через форму
+    #                 self.image.seek(0)
+    #                 file_to_upload = self.image
+    #             else:
+    #                 # Файл уже на диске
+    #                 file_to_upload = self.image.path
                 
-                # Загружаем на Cloudinary
-                upload_result = cloudinary.uploader.upload(
-                    file_to_upload,
-                    folder="products",
-                    resource_type="image",
-                    timeout=60
-                )
+    #             # Загружаем на Cloudinary
+    #             upload_result = cloudinary.uploader.upload(
+    #                 file_to_upload,
+    #                 folder="products",
+    #                 resource_type="image",
+    #                 timeout=60
+    #             )
                 
-                # Сохраняем URL
-                self.image_url = upload_result['secure_url']
+    #             # Сохраняем URL
+    #             self.image_url = upload_result['secure_url']
                 
-                # Очищаем временный файл
-                self.image.delete(save=False)
-                self.image = None
+    #             # Очищаем временный файл
+    #             self.image.delete(save=False)
+    #             self.image = None
                 
-            except Exception as e:
-                # Логируем ошибку но НЕ прерываем сохранение
-                print(f"⚠️ Cloudinary upload failed: {e}")
-                # Файл останется на Railway (временно), но это не критично
+    #         except Exception as e:
+    #             # Логируем ошибку но НЕ прерываем сохранение
+    #             print(f"⚠️ Cloudinary upload failed: {e}")
+    #             # Файл останется на Railway (временно), но это не критично
         
-        super().save(*args, **kwargs)
+    #     super().save(*args, **kwargs)
 

@@ -49,7 +49,7 @@ class ProductImageInline(admin.TabularInline):
     """Инлайн для изображений товара"""
     model = ProductImage
     extra = 1
-    fields = ['image_url', 'order', 'image_preview']
+    fields = ['image', 'image_url', 'order', 'image_preview']
     readonly_fields = ['image_preview']
     
     def image_preview(self, obj):
@@ -226,4 +226,4 @@ class ProductImageAdmin(admin.ModelAdmin):
             )
         return "Нет изображения"
     image_preview.short_description = 'Превью'
-    
+
